@@ -11,7 +11,7 @@ import SwiftUI
 struct MomentoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
     }
 }

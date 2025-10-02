@@ -24,7 +24,7 @@ struct headerView: View {
         .padding(.horizontal, 8)
         .frame(height: 60)
         .background(Color("bgColor")
-            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 2)
         )
     }
 }
