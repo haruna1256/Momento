@@ -13,12 +13,15 @@ struct headerView: View {
         HStack(spacing: 0) {
             Image("logo")
                 .frame(width: 100, height: 42)
-                .padding(.leading, 8)
             Spacer()
-            Image("icon")
-                .frame(width: 38, height: 38)
-                .padding(.trailing, 8)
+            Button {
+                print("アイコンが押されたよ")
+            } label: {
+                Image("icon")
+                    .frame(width: 38, height: 38)
+            }
         }
+        .padding(.horizontal, 8)
         .frame(height: 60)
         .background(Color("bgColor")
             .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
