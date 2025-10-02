@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct MainTabView: View {
+    // 選択中のView
+    @State private var selectedTab: TabItem = .home
     var body: some View {
-        
+        VStack(spacing: 0) {
+            selectedTab
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            footerView(selectedTab: $selectedTab)
+                .edgesIgnoringSafeArea(.bottom)
+        }
     }
 }
 

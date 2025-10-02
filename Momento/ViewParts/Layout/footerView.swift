@@ -9,8 +9,8 @@ import SwiftUI
 
 struct footerView: View {
     // 選択状態を保持する
-    @State private var selectedTab: TabItem = .home
-    
+    @Binding var selectedTab: TabItem
+
     var body: some View {
         HStack(spacing: 0) {
             ForEach(TabItem.allCases, id: \.self) { tab in
@@ -19,7 +19,7 @@ struct footerView: View {
                         selectedTab = tab
                     }) {
                         // アイコン、タイトルの表示
-                        VStack {
+                        VStack(spacing: 0) {
                             (selectedTab == tab ? tab.selectedImage : tab.unselectedImage)
                                 .resizable()
                                 .frame(width: 36, height: 36)
@@ -36,8 +36,4 @@ struct footerView: View {
         .padding(.horizontal, 8)
         .background(Color("bgColor"))
     }
-}
-
-#Preview {
-    footerView()
 }
