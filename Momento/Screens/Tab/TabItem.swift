@@ -49,13 +49,13 @@ extension TabItem: View {
     var body: some View {
         switch self {
         case .home:
-
+            HomeView()
         case .map:
-
+            MapView()
         case .notification:
-
+            NotificationView()
         case .setting:
-
+            SettingView()
         }
     }
 
