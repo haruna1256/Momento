@@ -12,11 +12,12 @@ struct MainTabView: View {
     @State private var selectedTab: TabItem = .home
     var body: some View {
         VStack(spacing: 0) {
+            headerView()
             selectedTab
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             footerView(selectedTab: $selectedTab)
-                .edgesIgnoringSafeArea(.bottom)
         }
+
     }
 }
 
