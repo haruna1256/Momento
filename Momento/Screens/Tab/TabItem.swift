@@ -20,28 +20,37 @@ extension TabItem {
     var selectedImage: Image {
         switch self {
         case .home:
-            return Image("icnTabOnHome")
+            return Image("iconTabOnHome")
         case .map:
-            return Image("icnTabOnMap")
+            return Image("iconTabOnMap")
         case .notification:
-            return Image("icnTabOnNotification")
+            return Image("iconTabOnNotification")
         case .setting:
-            return Image("icnTabOnSetting")
+            return Image("iconTabOnSetting")
         }
     }
     // 選択されていない時の画像デザイン
     var unselectedImage: Image {
         switch self {
         case .home:
-            return Image("icnTabOffHome")
+            return Image("iconTabOffHome")
         case .map:
-            return Image("icnTabOffMap")
+            return Image("iconTabOffMap")
         case .notification:
-            return Image("icnTabOffNotification")
+            return Image("iconTabOffNotification")
         case .setting:
-            return Image("icnTabOffSetting")
+            return Image("iconTabOffSetting")
         }
     }
+    // タイトル
+    var title: String {
+            switch self {
+            case .home: return "ホーム"
+            case .map: return "マップ"
+            case .notification: return "通知"
+            case .setting: return "設定"
+            }
+        }
 }
 
 // 画面遷移元を定義
