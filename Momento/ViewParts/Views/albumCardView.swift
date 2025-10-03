@@ -27,19 +27,19 @@ struct albumCardView: View {
                         Text("ECCコンピュータ専門学校")
                             .font(.caption2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.primary)
+                            .foregroundColor(Color("accentTextColor"))
 
                         // カテゴリと日付のHStack
                         HStack {
                             Text("学校")
                                 .font(.caption2)
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color("accentTextColor"))
 
                             Spacer() // 日付を右端に寄せる
 
                             Text("2024.06.01")
                                 .font(.caption2)
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color("accentTextColor"))
                         }
                     }
                     // テキスト部分のパディング（上下左右）
