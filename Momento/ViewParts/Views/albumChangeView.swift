@@ -47,7 +47,7 @@ struct albumChangeView: View {
                             .frame(width: 190)
                             Spacer()
 
-                            // MARK: - 3. 追加ボタン（+）
+                           // アルバム追加ボタン
                             Button(action: {
                                 print("アルバム追加")
                             }) {
@@ -71,6 +71,7 @@ struct albumChangeView: View {
                         .padding(.top, 0) // 上部の余白
                     }
                 .frame(height: 60) // ヘッダー全体の高さを固定
+                .background(Color("bgColor"))
             }
         }
 
