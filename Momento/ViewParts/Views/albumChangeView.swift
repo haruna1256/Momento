@@ -71,7 +71,7 @@ struct albumChangeView: View {
                         .padding(.top, 0) // 上部の余白
                     }
                 .frame(height: 60) // ヘッダー全体の高さを固定
-                .background(Color("bgColor"))
+                .background(Color("bgBodyColor"))
             }
         }
 
