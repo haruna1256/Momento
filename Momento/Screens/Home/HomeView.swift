@@ -38,26 +38,37 @@ struct HomeView: View {
             albumChangeView(selectedCategoryId: $selectedCategoryId)
                 .zIndex(1)
 
-            // アルバムカードグリッド表示
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 30) {
-                    // データ配列を基にカードを生成
-                    ForEach(filteredAlbums) { album in
-                        let resolvedColor = getColor(for: album.categoryID)
 
-                        albumCardView(
-                            title: album.title,
-                            place: album.place,
-                            date: album.date,
-                            imageName: album.imageName,
-                            categoryColor: resolvedColor
-                        )
+                // アルバムカードグリッド表示
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 30) {
+                        // データ配列を基にカードを生成
+                        ForEach(filteredAlbums) { album in
+                            let resolvedColor = getColor(for: album.categoryID)
+
+                            albumCardView(
+                                title: album.title,
+                                place: album.place,
+                                date: album.date,
+                                imageName: album.imageName,
+                                categoryColor: resolvedColor
+                            )
+                        }
                     }
                 }
+                .padding(.horizontal, 10)
             }
-            .padding(.horizontal, 10)
-
-        }
+        .overlay(
+                Button(action: {
+                    // カメラ起動
+                }){
+                    // カメラボタン
+                    cameraIconView()
+                        .padding()
+                        .padding(.trailing, 8)
+                },
+                    alignment: .bottomTrailing
+                    )
         .background(Color("bgBodyColor"))
     }
 }
