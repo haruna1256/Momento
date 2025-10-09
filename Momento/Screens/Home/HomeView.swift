@@ -24,12 +24,13 @@ struct HomeView: View {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
                     // データ配列を基にカードを生成
-                    ForEach(sampleAlbums) { album in
+                    ForEach(AlbumMocks) { album in
                         albumCardView(
                             title: album.title,
                             place: album.place,
                             date: album.date,
-                            imageName: album.imageName
+                            imageName: album.imageName,
+                            categoryColor: album.categoryColor
                         )
                     }
                 }
