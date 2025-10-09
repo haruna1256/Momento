@@ -48,7 +48,8 @@ struct albumListView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(Color("bgColor"))
-        .frame(width: .infinity, height: 72)
+        .frame(maxWidth: .infinity)
+        .frame(height: 72)
     }
 }
 
