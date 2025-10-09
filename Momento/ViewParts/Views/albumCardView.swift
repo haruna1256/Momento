@@ -12,6 +12,21 @@ struct albumCardView: View {
     let place: String
     let date: String
     let imageName: String
+    let categoryColor: Color
+    // カードの共通サイズを定数化（前回の修正から流用）
+        private let cardWidth: CGFloat = 148
+        private let cornerRadiusValue: CGFloat = 8
+
+        private var imageGradient: LinearGradient {
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.black.opacity(0.3),
+                    Color.clear
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
     var body: some View {
         // カード全体のコンテナ。サイズ、白色背景、角丸、影を設定
         VStack(spacing: 0) {
@@ -24,26 +39,26 @@ struct albumCardView: View {
                     .foregroundColor(Color("imageShadowColor"))
 
             }
-            .frame(width: 148, height: 148)
+            .frame(width: cardWidth, height: cardWidth)
             // 下部テキストの表示
             VStack(alignment: .leading, spacing: 4) {
                 // メインタイトル
                 Text(title)
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(Color("accentTextColor"))
+                    .foregroundColor(Color(categoryColor))
 
                 // 場所と日付のHStack
                 HStack {
                     Text(place)
                         .font(.caption2)
-                        .foregroundColor(Color("accentTextColor"))
+                        .foregroundColor(categoryColor.opacity(0.8))
 
                     Spacer() // 日付を右端に寄せる
 
                     Text(date)
                         .font(.caption2)
-                        .foregroundColor(Color("accentTextColor"))
+                        .foregroundColor(categoryColor.opacity(0.8))
                 }
             }
             // テキスト部分のパディング（上下左右）
@@ -64,6 +79,7 @@ struct albumCardView: View {
         title: "ECCコンピュータ専門学校",
         place: "学校",
         date: "2024.06.01",
-        imageName: "albumImage"
+        imageName: "albumImage",
+        categoryColor: .blue
     )
 }
