@@ -8,24 +8,38 @@
 import SwiftUI
 
 struct albumListView: View {
+    let title: String
+    let date: String
+    let imageName: String
+    let place: String
+    let categoryColor: Color
+    let location: Int
     var body: some View {
         HStack(spacing: 16) {
-            Image("image1")
+            Image(imageName)
                 .resizable()
                 .frame(width: 72, height: 64)
 
             VStack(alignment: .leading) {
-                Text("日付")
+                Text(date)
                     .font(.caption2)
-                Text("Momento")
-                    .font(.headline)
-                Text("Momento is a photo album app.")
-                    .font(.caption2)
-                    .lineLimit(1)
+                    .foregroundStyle(categoryColor)
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundStyle(categoryColor)
+                HStack(spacing: 0) {
+                    Text(place)
+                        .foregroundStyle(categoryColor)
+                        .font(.caption2)
+                        .lineLimit(1)
+                    Spacer()
+                    Text("現在地から\(location)m")
+                        .foregroundStyle(categoryColor)
+                        .font(.caption)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
             }
-            Text("現在地から500m")
-                .font(.caption)
-                .frame(maxHeight: .infinity, alignment: .bottom)
+
 
             Image("goIcon")
                 .resizable()
@@ -39,5 +53,12 @@ struct albumListView: View {
 }
 
 #Preview {
-    albumListView()
+    albumListView(
+        title: "ECCコンピューター専門学校",
+                date: "2025/08/12",
+                imageName: "image1",
+                place: "学校",
+                categoryColor: .blue,
+                location: 250
+    )
 }
