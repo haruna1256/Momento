@@ -28,6 +28,11 @@ struct HomeView: View {
             return allAlbums.filter { $0.categoryID == selectedCategoryId }
         }
     }
+    // カテゴリIDからColorを取得する関数
+    private func getColor(for categoryId: String) -> Color {
+            // allCategoriesからIDが一致するものを探し、そのColorを返す。見つからない場合は灰色を返す。
+            return allCategories.first(where: { $0.id == categoryId })?.color ?? .gray
+        }
     var body: some View {
         VStack(spacing: 8) {
             albumChangeView(selectedCategoryId: $selectedCategoryId)
@@ -38,12 +43,14 @@ struct HomeView: View {
                 LazyVGrid(columns: columns, spacing: 30) {
                     // データ配列を基にカードを生成
                     ForEach(filteredAlbums) { album in
+                        let resolvedColor = getColor(for: album.categoryID)
+
                         albumCardView(
                             title: album.title,
                             place: album.place,
                             date: album.date,
                             imageName: album.imageName,
-                            categoryColor: album.categoryColor
+                            categoryColor: resolvedColor
                         )
                     }
                 }
