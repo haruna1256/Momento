@@ -8,33 +8,44 @@
 import SwiftUI
 
 struct notificationCardView: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Text("運営")
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(Color.cyan, lineWidth: 2)
-                    )
-                Text("2025/10/06")
-                    .foregroundColor(.gray)
-                    .font(.caption)
-            }
-            Text("運営からのお知らせ")
-                .font(.body)
-                .padding(.leading, 38)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 8)
-        .padding(.horizontal)
+    // 表示内容
+    let category: String = "運営"
+    let date: String = "2025/10/06"
+    let title: String = "運営からのお知らせ"
 
-        Rectangle()
-            .frame(maxWidth: .infinity)
-            .frame(height: 3)
+    var body: some View {
+        VStack(spacing: 0) {
+            // 通知内容
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Text(category)
+                        .foregroundColor(Color("textColor"))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .stroke(Color("textColor"), lineWidth: 2)
+                        )
+                    Text(date)
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                    Spacer()
+                }
+                Text(title)
+                    .font(.body)
+                    .padding(.leading, 38)
+                    .foregroundColor(Color("textColor"))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
             .padding(.horizontal)
-            .foregroundColor(.cyan.opacity(0.6))
+            Rectangle()
+                .frame(maxWidth: .infinity)
+                .frame(height: 3)
+                .foregroundColor(Color("accentTextColor"))
+                .padding(.horizontal)
+        }
+        .background(Color("bgBodyColor"))
     }
 }
 
