@@ -15,8 +15,8 @@ struct HomeView: View {
 
     // 2列レイアウト
     let columns = [
-        GridItem(.flexible(), spacing: 5),
-        GridItem(.flexible(), spacing: 5)
+        GridItem(.flexible(), spacing: 0),
+        GridItem(.flexible(), spacing: 0)
     ]
     // 選択されたカテゴリに基づいてアルバムをフィルタリング
     private var filteredAlbums: [AlbumMock] {
@@ -56,7 +56,7 @@ struct HomeView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal,20)
             }
         .overlay(
                 Button(action: {
