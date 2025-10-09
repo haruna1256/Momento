@@ -13,8 +13,8 @@ struct HomeView: View {
 
     // 2列レイアウト
         let columns = [
-            GridItem(.flexible(), spacing: 10),
-            GridItem(.flexible(), spacing: 10)
+            GridItem(.flexible(), spacing: 5),
+            GridItem(.flexible(), spacing: 5)
         ]
     var body: some View {
         VStack(spacing: 8) {
@@ -22,7 +22,7 @@ struct HomeView: View {
 
             // アルバムカードグリッド表示
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
+                LazyVGrid(columns: columns, spacing: 30) {
                     // データ配列を基にカードを生成
                     ForEach(AlbumMocks) { album in
                         albumCardView(
