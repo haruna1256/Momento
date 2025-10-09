@@ -7,6 +7,7 @@
 
 // 共有グループ（友達グループ・カテゴリ）を管理するテーブル
 import Foundation
+import SwiftUI
 
 struct Category: Identifiable, Decodable {
     let id: String                      // カテゴリーのID
@@ -29,6 +30,11 @@ struct Category: Identifiable, Decodable {
         self.createdAt = createdAt
     }
 
+    // SwiftUI Colorを取得するComputed Propertyを追加
+    var color: Color {
+        return Color(hex: self.colorHex)
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id = "categoryID"
         case name
@@ -37,3 +43,13 @@ struct Category: Identifiable, Decodable {
         case createdAt = "created_at"
     }
 }
+
+// ダミーデータ（「最近のアルバム」を特殊なカテゴリとして含める）
+let allCategories = [
+    Category(id: "recent", name: "最近のアルバム", colorHex: "#4C81FF", createdBy: "System"), // 青
+    Category(id: "family", name: "家族", colorHex: "#FF7D7D", createdBy: "User"), // 赤
+    Category(id: "friend", name: "友達", colorHex: "#7DFF7D", createdBy: "User"), // 緑
+    Category(id: "school", name: "学校", colorHex: "#A0A0FF", createdBy: "User"), // 薄紫
+    Category(id: "partTime", name: "バイト", colorHex: "#FFFF7D", createdBy: "User"), // 黄
+    Category(id: "self", name: "自分", colorHex: "#E0E0E0", createdBy: "User") // グレー
+]

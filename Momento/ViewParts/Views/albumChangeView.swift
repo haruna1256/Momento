@@ -19,7 +19,7 @@ struct albumChangeView: View {
                             VStack(spacing: 0) {
                                 Text("最近のアルバム")
                                     .font(.headline) // 大きめの太字
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color("textColor"))
 
                                 // アクティブなカテゴリを示すアンダーライン
                                 Rectangle()
@@ -34,7 +34,8 @@ struct albumChangeView: View {
                                         // カテゴリは非アクティブなスタイル
                                         Text(category)
                                             .font(.body)
-                                            .foregroundColor(Color("offColor"))
+                                            .foregroundColor(Color("textColor"))
+                                            .padding(.top, 8)
                                             .onTapGesture {
                                                 // 選択時の処理（例: selectedCategory = category）
                                             }
