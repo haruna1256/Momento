@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct notificationCardView: View {
+    // 新しいデータ構造を受け取る
+    let item: NotificationItem
     // 表示内容
     let category: String = "運営"
     let date: String = "2025/10/06"
@@ -18,20 +20,21 @@ struct notificationCardView: View {
             // 通知内容
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Text(category)
-                        .foregroundColor(Color("textColor"))
+                    Text(item.type.rawValue)
+                        .foregroundColor(Color(item.type.color))
                         .padding(.horizontal, 6)
                         .padding(.vertical, 3)
                         .overlay(
                             RoundedRectangle(cornerRadius: 4)
-                                .stroke(Color("textColor"), lineWidth: 2)
+                                .stroke(Color(item.type.color), lineWidth: 2)
                         )
-                    Text(date)
+                    Text(item.date)
                         .foregroundColor(.gray)
                         .font(.caption)
                     Spacer()
                 }
-                Text(title)
+                // 投稿内容
+                Text(item.message)
                     .font(.body)
                     .padding(.leading, 38)
                     .foregroundColor(Color("textColor"))
@@ -39,6 +42,7 @@ struct notificationCardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
             .padding(.horizontal)
+            // 下線
             Rectangle()
                 .frame(maxWidth: .infinity)
                 .frame(height: 3)
@@ -50,5 +54,5 @@ struct notificationCardView: View {
 }
 
 #Preview {
-    notificationCardView()
+    notificationCardView(item: NotificationItem(type: .album, date: "2025/10/05", message: "CCさんがBBアルバムに追加されました"))
 }

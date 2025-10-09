@@ -17,6 +17,7 @@ struct MainTabView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             footerView(selectedTab: $selectedTab)
         }
+        .background(Color("bgBodyColor"))
 
     }
 }
