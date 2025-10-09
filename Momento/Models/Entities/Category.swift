@@ -46,10 +46,10 @@ struct Category: Identifiable, Decodable {
 
 // ダミーデータ（「最近のアルバム」を特殊なカテゴリとして含める）
 let allCategories = [
-    Category(id: "recent", name: "最近のアルバム", colorHex: "#4C81FF", createdBy: "System"), // 青
-    Category(id: "family", name: "家族", colorHex: "#FF7D7D", createdBy: "User"), // 赤
-    Category(id: "friend", name: "友達", colorHex: "#7DFF7D", createdBy: "User"), // 緑
-    Category(id: "school", name: "学校", colorHex: "#A0A0FF", createdBy: "User"), // 薄紫
-    Category(id: "partTime", name: "バイト", colorHex: "#FFFF7D", createdBy: "User"), // 黄
-    Category(id: "self", name: "自分", colorHex: "#E0E0E0", createdBy: "User") // グレー
+    Category(id: "000", name: "最近のアルバム", colorHex: "#4C81FF", createdBy: "System"), // 青
+    Category(id: "001", name: "家族", colorHex: "#FF7D7D", createdBy: "User"), // 赤
+    Category(id: "002", name: "友達", colorHex: "#7DFF7D", createdBy: "User"), // 緑
+    Category(id: "003", name: "学校", colorHex: "#A0A0FF", createdBy: "User"), // 薄紫
+    Category(id: "004", name: "バイト", colorHex: "#FFFF7D", createdBy: "User"), // 黄
+    Category(id: "005", name: "自分", colorHex: "#E0E0E0", createdBy: "User") // グレー
 ]

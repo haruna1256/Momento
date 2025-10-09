@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct albumChangeView: View {
-    // 現在選択されているカテゴリのID
-    @State private var selectedCategoryId: String = "recent"
+    // 状態のバインディング
+    @Binding var selectedCategoryId: String
     // カテゴリリスト全体
     private let categories: [Category] = allCategories
     var body: some View {
@@ -92,5 +92,5 @@ struct AddAlbumButtonView: View {
 
 
 #Preview {
-    albumChangeView()
+    albumChangeView(selectedCategoryId: .constant("000"))
 }
