@@ -48,6 +48,8 @@ struct albumListView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(Color("bgColor"))
+        .cornerRadius(8)
+        .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
         .frame(maxWidth: .infinity)
         .frame(height: 72)
     }
@@ -56,10 +58,10 @@ struct albumListView: View {
 #Preview {
     albumListView(
         title: "ECCコンピューター専門学校",
-                date: "2025/08/12",
-                imageName: "image1",
-                place: "学校",
-                categoryColor: .blue,
-                location: 250
+        date: "2025/08/12",
+        imageName: "image1",
+        place: "学校",
+        categoryColor: .blue,
+        location: 250
     )
 }
