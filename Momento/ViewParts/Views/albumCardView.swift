@@ -36,7 +36,7 @@ struct albumCardView: View {
                     .scaledToFill()
                     .clipped()
                 Rectangle()
-                    .foregroundColor(Color("imageShadowColor"))
+                    .foregroundColor(Color("ImageShadowColor"))
 
             }
             .frame(width: cardWidth, height: cardWidth)

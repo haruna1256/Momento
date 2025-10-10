@@ -10,6 +10,7 @@ import SwiftUI
 struct CameraView: View {
     @State private var isFrontCamera = false
     @State private var flashMode: FlashMode = .auto
+    
 
     var body: some View {
         ZStack {
@@ -36,7 +37,7 @@ struct CameraView: View {
 
 }
 
-// MARK: - 2. ヘルパー構造体 (FlashModeは変更なし)
+// ヘルパー構造体 (FlashModeは変更なし)
 
 enum FlashMode {
     case on, off, auto

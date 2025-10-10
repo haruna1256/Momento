@@ -12,6 +12,8 @@ struct HomeView: View {
     @State private var selectedCategoryId: String = "000"
     // 全てのアルバムデータ
     private let allAlbums: [AlbumMock] = AlbumMocks
+    // 画面遷移用の状態変数 (カメラビューが表示されているか)
+    @State private var isShowingCameraView: Bool = false
 
     // 2列レイアウト
     let columns = [
@@ -30,49 +32,51 @@ struct HomeView: View {
     }
     // カテゴリIDからColorを取得する関数
     private func getColor(for categoryId: String) -> Color {
-            // allCategoriesからIDが一致するものを探し、そのColorを返す。見つからない場合は灰色を返す。
-            return allCategories.first(where: { $0.id == categoryId })?.color ?? .gray
-        }
+        // allCategoriesからIDが一致するものを探し、そのColorを返す。見つからない場合は灰色を返す。
+        return allCategories.first(where: { $0.id == categoryId })?.color ?? .gray
+    }
     var body: some View {
         VStack(spacing: 8) {
             albumChangeView(selectedCategoryId: $selectedCategoryId)
                 .zIndex(1)
+            // アルバムカードグリッド表示
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 30) {
+                    // データ配列を基にカードを生成
+                    ForEach(filteredAlbums) { album in
+                        let resolvedColor = getColor(for: album.categoryID)
 
-
-                // アルバムカードグリッド表示
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 30) {
-                        // データ配列を基にカードを生成
-                        ForEach(filteredAlbums) { album in
-                            let resolvedColor = getColor(for: album.categoryID)
-
-                            albumCardView(
-                                title: album.title,
-                                place: album.place,
-                                date: album.date,
-                                imageName: album.imageName,
-                                categoryColor: resolvedColor
-                            )
-                        }
+                        albumCardView(
+                            title: album.title,
+                            place: album.place,
+                            date: album.date,
+                            imageName: album.imageName,
+                            categoryColor: resolvedColor
+                        )
                     }
                 }
-                .padding(.horizontal,20)
             }
+            .padding(.horizontal,20)
+        }
         .overlay(
-                Button(action: {
-                    CameraView()
-                }){
-                    // カメラボタン
-                    cameraIconView(
-                        frameSize: 64,
-                        cameraIconSize: 40
-                    )
-                        .padding()
-                        .padding(.trailing, 8)
-                },
-                    alignment: .bottomTrailing
-                    )
+            Button(action: {
+                // 状態を更新して、CameraViewを表示させる
+                isShowingCameraView = true
+            }){
+                // カメラボタン
+                cameraIconView(
+                    frameSize: 64,
+                    cameraIconSize: 40
+                )
+                .padding()
+                .padding(.trailing, 8)
+            },
+            alignment: .bottomTrailing
+        )
         .background(Color("bgBodyColor"))
+        .fullScreenCover(isPresented: $isShowingCameraView) {
+                    CameraView()
+                }
     }
 }
 

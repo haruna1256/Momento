@@ -9,12 +9,13 @@ import SwiftUI
 // 上部コントロールバー
 struct controlBar: View {
     @State private var flashMode: FlashMode = .auto
+    @Environment(\.dismiss) var dismiss
     var body: some View {
 
             HStack(spacing: 0) {
                 // 戻るボタン
                 Button {
-                    flashMode.toggle()
+                    dismiss()
                 } label: {
                     Text("＞戻る")
                 }
