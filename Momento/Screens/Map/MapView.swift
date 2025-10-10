@@ -9,7 +9,24 @@ import SwiftUI
 
 struct MapView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        GeometryReader { geometry in
+            VStack(spacing: 6) {
+                mapStyleView()
+                    .frame(height: geometry.size.height / 2)
+                ScrollView {
+                    albumListView(
+                        title: "ECCコンピューター専門学校",
+                        date: "2025/08/12",
+                        imageName: "image1",
+                        place: "学校",
+                        categoryColor: .blue,
+                        location: 250
+                    )
+                }
+                .frame(height: geometry.size.height / 2)
+            }
+            .background(Color("bgBodyColor"))
+        }
     }
 }
 
