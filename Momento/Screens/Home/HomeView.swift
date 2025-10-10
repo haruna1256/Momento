@@ -60,10 +60,13 @@ struct HomeView: View {
             }
         .overlay(
                 Button(action: {
-                    // カメラ起動
+                    CameraView()
                 }){
                     // カメラボタン
-                    cameraIconView()
+                    cameraIconView(
+                        frameSize: 64,
+                        cameraIconSize: 40
+                    )
                         .padding()
                         .padding(.trailing, 8)
                 },
