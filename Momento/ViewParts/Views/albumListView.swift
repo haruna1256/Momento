@@ -4,39 +4,60 @@
 //
 //  Created by 川岸遥奈 on 2025/10/09.
 //
-
+import CoreLocation
 import SwiftUI
 
 struct albumListView: View {
-    let title: String
-    let date: String
-    let imageName: String
-    let place: String
-    let categoryColor: Color
-    let location: Int
+    let album: Album
+    // LocationManagerをObservableObjectとして受け取る
+    @ObservedObject var locationManager: LocationManager
+
+    private func getColor(for categoryId: String) -> Color {
+            return allCategories.first(where: { $0.id == categoryId })?.color ?? .gray
+        }
+    // LocationManagerのcurrentLocationを使って距離を計算
+    private func calculateDistance(from album: Album) -> Int? {
+            // 現在地がまだ取得されていない場合はnilを返す
+            guard let userLocation = locationManager.currentLocation else {
+                return nil
+            }
+
+            // アルバムの緯度経度がオプショナルでないため、そのまま使用
+            let albumLocation = CLLocation(latitude: album.latitude, longitude: album.longitude)
+
+            // メートル単位で距離を取得し、Int型に変換
+            return Int(userLocation.distance(from: albumLocation).rounded())
+        }
     var body: some View {
+        // 必要な値を計算
+                let categoryColor = getColor(for: album.categoryId)
+                let distance = calculateDistance(from: album) // Int? 型
+        // オプショナルな場所 (place) を安全にアンラップし、デフォルト値を設定
+        let displayPlace = album.place ?? "場所不明"
+
         HStack(spacing: 16) {
-            Image(imageName)
+            Image(album.coverPhoto)
                 .resizable()
                 .frame(width: 72, height: 64)
 
             VStack(alignment: .leading) {
-                Text(date)
+                Text(album.updatedAt, style: .date)
                     .font(.caption2)
                     .foregroundStyle(categoryColor)
-                Text(title)
+                Text(album.title)
                     .font(.subheadline)
                     .foregroundStyle(categoryColor)
                 HStack(spacing: 0) {
-                    Text(place)
+                    Text(album.place)
                         .foregroundStyle(categoryColor)
                         .font(.caption2)
                         .lineLimit(1)
                     Spacer()
-                    Text("現在地から\(location)m")
+                    Text(distance.map { "現在地から\($0)m" } ?? "現在地から---m")
                         .foregroundStyle(categoryColor)
                         .font(.caption)
                         .frame(maxHeight: .infinity, alignment: .bottom)
+
                 }
             }
 
@@ -56,12 +77,6 @@ struct albumListView: View {
 }
 
 #Preview {
-    albumListView(
-        title: "ECCコンピューター専門学校",
-        date: "2025/08/12",
-        imageName: "image1",
-        place: "学校",
-        categoryColor: .blue,
-        location: 250
-    )
+    // LocationManagerのモックインスタンスを作成し、現在のアルバムリストを渡す
+    albumListView(album: Album.dotonboriFood, locationManager: LocationManager())
 }

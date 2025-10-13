@@ -48,7 +48,7 @@ struct Category: Identifiable, Decodable {
 let allCategories = [
     Category(id: "000", name: "最近のアルバム", colorHex: "#4C81FF", createdBy: "System"), // 青
     Category(id: "001", name: "家族", colorHex: "#FF7D7D", createdBy: "User"), // 赤
-    Category(id: "002", name: "友達", colorHex: "#7DFF7D", createdBy: "User"), // 緑
+    Category(id: "002", name: "友達", colorHex: "#008b8b", createdBy: "User"), // 緑
     Category(id: "003", name: "学校", colorHex: "#A0A0FF", createdBy: "User"), // 薄紫
     Category(id: "004", name: "バイト", colorHex: "#FFFF7D", createdBy: "User"), // 黄
     Category(id: "005", name: "自分", colorHex: "#E0E0E0", createdBy: "User") // グレー

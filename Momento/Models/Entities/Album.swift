@@ -14,7 +14,8 @@ struct Album: Identifiable, Decodable {
     let title: String                   // アルバム名
     let description: String?            // アルバムの説明
     let categoryId: String              // カテゴリーのID
-    let coverPhotoId: String?           // 表紙の画像
+    let coverPhoto: String              // 表紙の画像
+    let place: String                   // 写真の住所or地名
     let latitude: Double                // 緯度
     let longitude: Double               // 経度
     let createdAt: Date                 // 作成日時
@@ -28,7 +29,8 @@ struct Album: Identifiable, Decodable {
         title: String,
         description: String? = nil,
         categoryId: String,
-        coverPhotoId: String? = nil,
+        coverPhoto: String,
+        place: String,
         latitude: Double = 0.0,
         longitude: Double = 0.0,
         createdAt: Date = Date(),
@@ -41,7 +43,8 @@ struct Album: Identifiable, Decodable {
         self.title = title
         self.description = description
         self.categoryId = categoryId
-        self.coverPhotoId = coverPhotoId
+        self.coverPhoto = coverPhoto
+        self.place = place
         self.latitude = latitude
         self.longitude = longitude
         self.createdAt = createdAt
@@ -56,7 +59,8 @@ struct Album: Identifiable, Decodable {
         case title
         case description
         case categoryId = "categoryID"
-        case coverPhotoId = "cover_photo_id"
+        case coverPhoto
+        case place
         case latitude
         case longitude
         case createdAt = "created_at"
@@ -111,7 +115,8 @@ extension Album {
             title: "🐙 道頓堀グルメ天国",
             description: "食い倒れの旅！たこ焼き、お好み焼き、串カツ。",
             categoryId: "002",
-            coverPhotoId: "p-o01",
+            coverPhoto: "Image7",
+            place: "道頓堀",
             latitude: 34.6685,
             longitude: 135.5015, // アルバムの緯度経度
             createdAt: Date(timeIntervalSinceNow: -86400 * 10),
@@ -143,7 +148,8 @@ extension Album {
             title: "🏯 大阪城 2025年春",
             description: "桜が満開で最高でした。共同編集者あり。",
             categoryId: "001",
-            coverPhotoId: "p-o03",
+            coverPhoto: "Image8",
+            place: "大阪城",
             latitude: 34.6873,
             longitude: 135.5262,
             createdAt: Date(timeIntervalSinceNow: -86400 * 5),
@@ -176,6 +182,8 @@ extension Album {
             title: "🛳️ 神戸の夜景",
             description: "モザイクで撮った写真。",
             categoryId: "001",
+            coverPhoto: "Image9",
+            place: "神戸",
             latitude: 34.6853, // アルバムの緯度経度 (神戸)
             longitude: 135.1856,
             createdAt: Date(timeIntervalSinceNow: -86400),
@@ -192,6 +200,8 @@ extension Album {
             ownerId: "user-d",
             title: "⛩️ 次の京都旅行計画",
             categoryId: "002",
+            coverPhoto: "Image10",
+            place: "京都",
             latitude: 35.0116, // 京都御所付近
             longitude: 135.7681,
             createdAt: Date(timeIntervalSinceNow: -86400 * 1),
