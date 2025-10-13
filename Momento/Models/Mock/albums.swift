@@ -26,3 +26,4 @@ let AlbumMocks = [
     AlbumMock(title: "友達との山登り", place: "高尾山", date: "2025.05.01", imageName: "image5", categoryID: "002"),
     AlbumMock(title: "一人旅の思い出", place: "京都", date: "2025.04.20", imageName: "image6", categoryID: "005"),
 ]
+
