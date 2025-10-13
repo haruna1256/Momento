@@ -13,6 +13,8 @@ import Combine
 struct LocationAnnotation: Identifiable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
+    let title: String
+    let categoryId: String
 }
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
@@ -32,7 +34,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
         // desiredAccuracy の設定は、init の完了を待ってから実行する。
         DispatchQueue.main.async {
-             self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         }
     }
 
@@ -41,21 +43,47 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         // startUpdatingLocation() の呼び出しは権限付与後に delegate メソッドで行う。
     }
 
+    func setPins(from albums: [Album]) {
+            // 現在地追跡を停止
+            locationManager.stopUpdatingLocation()
+
+            let newAnnotations: [LocationAnnotation] = albums.map { album in
+                // Albumの緯度経度を使ってLocationAnnotationを作成
+                return LocationAnnotation(
+                    coordinate: CLLocationCoordinate2D(
+                        latitude: album.latitude,
+                        longitude: album.longitude
+                    ),
+                    title: album.title, // Albumのタイトルをそのまま使用
+                    categoryId: album.categoryId
+                )
+            }
+
+            // 1. annotations を更新
+            DispatchQueue.main.async {
+                self.annotations = newAnnotations
+
+                // 複数のピンに対応するため、regionは最初のピンに合わせる
+                if let firstAlbum = albums.first {
+                    let center = CLLocationCoordinate2D(latitude: firstAlbum.latitude, longitude: firstAlbum.longitude)
+                    let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05) // 広めのズームレベル
+                    self.region = MKCoordinateRegion(center: center, span: span)
+                    self.regionUpdateID = UUID() // 更新通知
+                }
+            }
+        }
+
     // 位置情報が更新されたときに呼ばれるdelegateメソッド
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
 
-        // Publishing changesエラー対策: メインスレッドの次のサイクルで実行
         DispatchQueue.main.async {
             let center = location.coordinate
             let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
 
-            // 1. annotations の更新
-            self.annotations = [LocationAnnotation(coordinate: center)]
-
-            // 2. region と regionUpdateID の更新
+            // region の更新は継続（地図の中心を現在地に合わせるため）
             self.region = MKCoordinateRegion(center: center, span: span)
-            self.regionUpdateID = UUID() // IDを更新してビューに通知
+            self.regionUpdateID = UUID()
 
             // 取得成功後、停止する
             manager.stopUpdatingLocation()
