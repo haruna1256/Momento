@@ -16,6 +16,7 @@ struct CameraView: View {
 
     @State private var didTapShutter = false
     @State private var flashMode: FlashMode = .auto
+    @State private var isFrontCamera: Bool = false
 
 
     var body: some View {
@@ -32,17 +33,28 @@ struct CameraView: View {
 
             // UIオーバーレイ
             VStack {
-                // 上部コントロールバー (白文字で、背景はカメラプレビュー)
-                controlBar()
+                // 上部コントロールバー
+                // flashModeのバインドと、カメラ切り替えアクションを渡す
+                controlBar(flashMode: $flashMode)
+                    .background(Color("bgBodyColor"))
 
                 Spacer()
 
                 // 下部シャッターボタンエリア (底部)
-                shutterArea()
+                shutterArea(
+                    isFrontCamera: $isFrontCamera,
+                    onShutterTap: {
+                        // 実際の写真撮影メソッドを呼び出す
+                        // cameraManager.takePhoto(flashMode: flashMode)
+                        didTapShutter = true
+                    },
+                    onFlipTap: {
+                        cameraManager.switchCamera()
+                        self.isFrontCamera.toggle()
+                    }
+                )
+                .background(Color("bgBodyColor"))
             }
-            .padding(.bottom, 30)
-            .padding(.horizontal, 20)
-
         }
         .statusBarHidden(true)
         .onAppear {
@@ -58,7 +70,7 @@ struct CameraView: View {
             // Viewが閉じられたらセッションを停止
             cameraManager.stopSession()
         }
-        .alert("シャッターが切られました！", isPresented: $didTapShutter) {
+        .alert("写真を撮ったよ！", isPresented: $didTapShutter) {
             Button("OK", role: .cancel) { }
         }
     }
