@@ -6,17 +6,29 @@
 //
 
 import SwiftUI
-
+import AVFoundation
+// カメラ画面を表示するview
 struct CameraView: View {
-    @State private var isFrontCamera = false
+    // カメラ処理の切り出し部分
+    // @StateObjectでCameraManagerをインスタンス化
+    @StateObject private var cameraManager = CameraManager()
+    @State private var isCameraSetup = false        // カメラの初期設定完了フラグ
+
+    @State private var didTapShutter = false
     @State private var flashMode: FlashMode = .auto
-    
+
 
     var body: some View {
         ZStack {
-            // カメラプレビューエリア (仮)
-            Color("bgBodyColor")
-                .ignoresSafeArea()
+            // 実際のカメラプレビューエリア
+            if isCameraSetup {
+                CameraPreviewView(cameraManager: cameraManager)
+                    .ignoresSafeArea()
+            } else {
+                // カメラ設定中の代替ビュー
+                Color.black.ignoresSafeArea()
+                ProgressView().controlSize(.large)
+            }
 
             // UIオーバーレイ
             VStack {
@@ -33,27 +45,21 @@ struct CameraView: View {
 
         }
         .statusBarHidden(true)
-    }
-
-}
-
-// ヘルパー構造体 (FlashModeは変更なし)
-
-enum FlashMode {
-    case on, off, auto
-    // ... (FlashModeの定義は省略) ...
-    var iconName: String {
-        switch self {
-        case .on: return "bolt.fill"
-        case .off: return "bolt.slash.fill"
-        case .auto: return "bolt.badge.automatic.fill"
+        .onAppear {
+            // Viewが表示されたらカメラ設定を開始
+            cameraManager.setupSession { success in
+                if success {
+                    isCameraSetup = true
+                    cameraManager.startSession() // セッションを開始
+                }
+            }
         }
-    }
-    mutating func toggle() {
-        switch self {
-        case .auto: self = .on
-        case .on: self = .off
-        case .off: self = .auto
+        .onDisappear {
+            // Viewが閉じられたらセッションを停止
+            cameraManager.stopSession()
+        }
+        .alert("シャッターが切られました！", isPresented: $didTapShutter) {
+            Button("OK", role: .cancel) { }
         }
     }
 }
