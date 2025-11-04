@@ -5,117 +5,142 @@
 //  Created by 川岸遥奈 on 2025/11/03.
 //
 import AVFoundation
-import Foundation
+import SwiftUI
 
-// カメラ処理（セッション管理、入力/出力設定）のロジック
+class CameraManager: NSObject, ObservableObject {
+    @Published var previewLayer: AVCaptureVideoPreviewLayer?
 
-class CameraManager: ObservableObject {
-    // プレビュー層を保持するための公開プロパティ
-    var previewLayer: AVCaptureVideoPreviewLayer?
-
-    // カメラのセッション
     private var captureSession: AVCaptureSession?
+    private var videoDeviceInput: AVCaptureDeviceInput?
+    private var photoOutput: AVCapturePhotoOutput?
 
-    // 現在使用しているカメラの位置 (背面/前面)
-    private var currentCameraPosition: AVCaptureDevice.Position = .back
+    private let sessionQueue = DispatchQueue(label: "camera.session.queue")
 
-    // セッションの設定
     func setupSession(completion: @escaping (Bool) -> Void) {
-        // セッションが既に実行中なら終了
-        if captureSession != nil {
-            completion(true)
-            return
-        }
+        sessionQueue.async { [weak self] in
+            guard let self = self else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
 
-        // 新しいセッションを作成
-        let session = AVCaptureSession()
-        self.captureSession = session
+            // セッションの作成
+            let session = AVCaptureSession()
+            session.beginConfiguration()
 
-        // 入力と出力の設定
-        do {
-            try configureCaptureInput(session: session)
-            try configureCaptureOutput(session: session)
+            // セッション品質の設定
+            if session.canSetSessionPreset(.photo) {
+                session.sessionPreset = .photo
+            }
 
-            // プレビューレイヤーの作成
-            previewLayer = AVCaptureVideoPreviewLayer(session: session)
-            previewLayer?.videoGravity = .resizeAspectFill // 画面いっぱいに表示
+            // カメラデバイスの取得
+            guard let videoDevice = AVCaptureDevice.default(
+                .builtInWideAngleCamera,
+                for: .video,
+                position: .back
+            ) else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
 
-            completion(true)
-        } catch {
-            print("カメラ設定エラー: \(error.localizedDescription)")
-            completion(false)
-        }
-    }
+            // ビデオ入力の設定
+            do {
+                let videoInput = try AVCaptureDeviceInput(device: videoDevice)
+                if session.canAddInput(videoInput) {
+                    session.addInput(videoInput)
+                    self.videoDeviceInput = videoInput
+                } else {
+                    session.commitConfiguration()
+                    DispatchQueue.main.async { completion(false) }
+                    return
+                }
+            } catch {
+                print("カメラ入力エラー: \(error.localizedDescription)")
+                session.commitConfiguration()
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
 
-    // カメラの入力設定
-    private func configureCaptureInput(session: AVCaptureSession) throws {
-        // 既存の入力を削除
-        session.inputs.forEach { session.removeInput($0) }
+            // 写真出力の設定
+            let output = AVCapturePhotoOutput()
+            if session.canAddOutput(output) {
+                session.addOutput(output)
+                self.photoOutput = output
+            }
 
-        // デバイス（カメラ）の取得
-        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera,
-                                                   for: .video,
-                                                   position: currentCameraPosition) else {
-            throw CameraError.inputUnavailable
-        }
+            session.commitConfiguration()
 
-        // 入力としてセッションに追加
-        let cameraInput = try AVCaptureDeviceInput(device: camera)
-        if session.canAddInput(cameraInput) {
-            session.addInput(cameraInput)
-        } else {
-            throw CameraError.inputNotAdded
-        }
-    }
+            // セッションを保存
+            self.captureSession = session
 
-    // 出力設定（今回は写真撮影に必須のAVCapturePhotoOutputのみ）
-    private func configureCaptureOutput(session: AVCaptureSession) throws {
-        // 既存の出力を削除
-        session.outputs.forEach { session.removeOutput($0) }
+            // プレビューレイヤーの作成（メインスレッドで）
+            DispatchQueue.main.async {
+                let previewLayer = AVCaptureVideoPreviewLayer(session: session)
+                previewLayer.videoGravity = .resizeAspectFill
 
-        let photoOutput = AVCapturePhotoOutput()
-        if session.canAddOutput(photoOutput) {
-            session.addOutput(photoOutput)
-        } else {
-            throw CameraError.outputNotAdded
-        }
-    }
+                // デバイスの向きに応じた接続設定
+                if let connection = previewLayer.connection {
+                    if connection.isVideoOrientationSupported {
+                        connection.videoOrientation = .portrait
+                    }
+                }
 
-    // カメラセッションの開始
-    func startSession() {
-        if let session = captureSession, !session.isRunning {
-            // 別スレッドでセッションを開始（メインスレッドのブロックを避ける）
-            DispatchQueue.global(qos: .userInitiated).async {
-                session.startRunning()
+                self.previewLayer = previewLayer
+                completion(true)
             }
         }
     }
 
-    // カメラセッションの停止
-    func stopSession() {
-        if let session = captureSession, session.isRunning {
-            session.stopRunning()
+    func startSession() {
+        sessionQueue.async { [weak self] in
+            self?.captureSession?.startRunning()
         }
     }
 
-    // カメラの切り替え
-    func switchCamera() {
-        currentCameraPosition = currentCameraPosition == .back ? .front : .back
+    func stopSession() {
+        sessionQueue.async { [weak self] in
+            self?.captureSession?.stopRunning()
+        }
+    }
 
-        // セッションを再設定（入力の変更）
-        if let session = captureSession {
+    func switchCamera() {
+        sessionQueue.async { [weak self] in
+            guard let self = self,
+                  let session = self.captureSession,
+                  let currentInput = self.videoDeviceInput else {
+                return
+            }
+
+            session.beginConfiguration()
+            session.removeInput(currentInput)
+
+            // 現在の位置とは逆のカメラを取得
+            let newPosition: AVCaptureDevice.Position =
+                currentInput.device.position == .back ? .front : .back
+
+            guard let newDevice = AVCaptureDevice.default(
+                .builtInWideAngleCamera,
+                for: .video,
+                position: newPosition
+            ) else {
+                session.addInput(currentInput)
+                session.commitConfiguration()
+                return
+            }
+
             do {
-                try configureCaptureInput(session: session)
+                let newInput = try AVCaptureDeviceInput(device: newDevice)
+                if session.canAddInput(newInput) {
+                    session.addInput(newInput)
+                    self.videoDeviceInput = newInput
+                } else {
+                    session.addInput(currentInput)
+                }
             } catch {
                 print("カメラ切り替えエラー: \(error.localizedDescription)")
+                session.addInput(currentInput)
             }
+
+            session.commitConfiguration()
         }
     }
-}
-
-// エラー定義
-enum CameraError: Error {
-    case inputUnavailable
-    case inputNotAdded
-    case outputNotAdded
 }

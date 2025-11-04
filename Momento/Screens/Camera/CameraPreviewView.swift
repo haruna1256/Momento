@@ -4,32 +4,54 @@
 //
 //  Created by 川岸遥奈 on 2025/11/03.
 //
+
 import SwiftUI
 import AVFoundation
-// CameraManagerからプレビュー層を受け取り、SwiftUIに表示するためのブリッジ
 
 struct CameraPreviewView: UIViewRepresentable {
-    // CameraManagerからプレビュー層を受け取る
-    let cameraManager: CameraManager
+    @ObservedObject var cameraManager: CameraManager
 
-    // プレビュー層をホストするUIViewを作成
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        view.backgroundColor = .black // プレビューがない時の背景
+    func makeUIView(context: Context) -> PreviewView {
+        let view = PreviewView()
+        view.backgroundColor = .black
 
-        // CameraManagerからPreviewLayerを取得し、UIViewのLayerとして追加
+        // プレビューレイヤーを設定
         if let previewLayer = cameraManager.previewLayer {
-            previewLayer.frame = view.bounds
-            view.layer.addSublayer(previewLayer)
+            view.videoPreviewLayer = previewLayer
+            previewLayer.videoGravity = .resizeAspectFill
         }
+
         return view
     }
 
-    // Viewが更新された時の処理
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // プレビュー層のフレームサイズをViewのサイズに合わせて更新
-        if let previewLayer = cameraManager.previewLayer {
-            previewLayer.frame = uiView.bounds
+    func updateUIView(_ uiView: PreviewView, context: Context) {
+        // プレビューレイヤーの更新を確認
+        if uiView.videoPreviewLayer == nil,
+           let previewLayer = cameraManager.previewLayer {
+            uiView.videoPreviewLayer = previewLayer
+            previewLayer.videoGravity = .resizeAspectFill
         }
+    }
+}
+
+// カスタムUIViewクラス - レイヤーのフレーム自動調整を実装
+class PreviewView: UIView {
+    var videoPreviewLayer: AVCaptureVideoPreviewLayer? {
+        didSet {
+            if let oldLayer = oldValue {
+                oldLayer.removeFromSuperlayer()
+            }
+
+            if let newLayer = videoPreviewLayer {
+                layer.addSublayer(newLayer)
+                newLayer.frame = bounds
+            }
+        }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // レイアウトが変更されたらプレビューレイヤーのフレームも更新
+        videoPreviewLayer?.frame = bounds
     }
 }
