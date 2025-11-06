@@ -57,7 +57,7 @@ struct shutterArea: View {
 }
 
 #Preview {
-    @State var isFront = false
+    @Previewable @State var isFront = false
     return ZStack {
         Color.black.ignoresSafeArea()
         shutterArea(

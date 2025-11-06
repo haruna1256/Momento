@@ -9,10 +9,10 @@ import Foundation
 import UIKit
 
 // バックエンドへの写真アップロード用サービス
-class PhotoUploadService {
+class PhotoUploadService: ObservableObject {
 
     // バックエンドのエンドポイントURL
-    private let uploadURL = "https://your-api.com/api/upload" // ← 実際のURLに変更
+    private let uploadURL = "http://10.109.0.164:4000/upload"
 
     enum UploadError: Error {
         case invalidImageData

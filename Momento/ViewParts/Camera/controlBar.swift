@@ -41,7 +41,7 @@ struct controlBar: View {
 }
 
 #Preview {
-    @State var mode: FlashMode = .auto
+    @Previewable @State var mode: FlashMode = .auto
 
         return ZStack {
             // カメラプレビューの代わりとして黒い背景を設定
