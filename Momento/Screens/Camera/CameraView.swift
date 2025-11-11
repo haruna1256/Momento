@@ -27,8 +27,13 @@ struct CameraView: View {
     @State private var uploadError: String?
     @State private var showUploadAlert = false
 
-    // アルバムIDを固定 or 選択できるようにする
-    private let albumId = "default_album"
+    // 利用可能なアルバム一覧（実際にはAPIから取得する）
+    @State private var availableAlbums: [Album] = []
+
+    // デフォルトのアルバムID
+    private var defaultAlbumId: String {
+        availableAlbums.first?.id ?? ""
+    }
 
     var body: some View {
         ZStack {
@@ -66,15 +71,18 @@ struct CameraView: View {
             if showConfirmView, let image = capturedImage {
                 PhotoConfirmView(
                     image: image,
+                    availableAlbums: availableAlbums,
+                    defaultAlbumId: defaultAlbumId,
+                    currentLocation: getCurrentLocationString(),
                     onDiscard: {
                         // 破棄：確認画面を閉じてカメラに戻る
                         showConfirmView = false
                         capturedImage = nil
                     },
-                    onSend: { caption in
+                    onSend: { metadata in
                         // 送信：アップロード処理を開始
                         showConfirmView = false
-                        uploadPhoto(image, caption: caption)
+                        uploadPhoto(image, metadata: metadata)
                     }
                 )
                 .transition(.move(edge: .bottom))
@@ -92,6 +100,8 @@ struct CameraView: View {
             checkCameraPermission()
             // 位置情報の取得を開始
             locationManager.requestLocation()
+            // アルバム一覧を取得（実際にはAPIから取得）
+            loadAlbums()
         }
         .onDisappear {
             cameraManager.stopSession()
@@ -111,6 +121,8 @@ struct CameraView: View {
             }
         }
     }
+
+    // MARK: - Photo Capture & Upload
 
     // 写真を撮影
     private func capturePhoto() {
@@ -133,15 +145,16 @@ struct CameraView: View {
     }
 
     // 写真をバックエンドにアップロード
-    private func uploadPhoto(_ image: UIImage, caption: String?) {
+    private func uploadPhoto(_ image: UIImage, metadata: PhotoMetadata) {
         isUploading = true
 
         // メタデータの準備
-        let metadata: [String: Any] = [
-            "albumId": albumId,
-            "caption": caption ?? "",
-            "latitude": locationManager.currentLocation?.coordinate.latitude ?? 0.0,
-            "longitude": locationManager.currentLocation?.coordinate.longitude ?? 0.0,
+        let uploadMetadata: [String: Any] = [
+            "albumId": metadata.albumId,
+            "caption": metadata.memo ?? "",
+            "place": metadata.place ?? "",  // 場所の名前（ユーザー入力）
+            "latitude": locationManager.currentLocation?.coordinate.latitude ?? 0.0,  // 緯度（位置情報）
+            "longitude": locationManager.currentLocation?.coordinate.longitude ?? 0.0,  // 経度（位置情報）
             "camera_position": isFrontCamera ? "front" : "back",
             "timestamp": ISO8601DateFormatter().string(from: Date())
         ]
@@ -150,7 +163,7 @@ struct CameraView: View {
             do {
                 let response = try await uploadService.uploadPhoto(
                     image: image,
-                    metadata: metadata
+                    metadata: uploadMetadata
                 )
 
                 await MainActor.run {
@@ -175,6 +188,8 @@ struct CameraView: View {
             }
         }
     }
+
+    // MARK: - Views
 
     private var permissionDeniedView: some View {
         VStack(spacing: 20) {
@@ -229,6 +244,7 @@ struct CameraView: View {
         }
     }
 
+    // MARK: - Helper Methods
 
     private func checkCameraPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -262,6 +278,28 @@ struct CameraView: View {
                 }
             }
         }
+    }
+
+    // アルバム一覧を読み込む
+    private func loadAlbums() {
+        // TODO: バックエンドAPIからアルバム一覧を取得
+        // 現時点ではモックデータを使用
+        availableAlbums = Album.mockAlbums
+        print("アルバム読み込み完了: \(availableAlbums.count)件")
+    }
+
+    // 現在地の住所を文字列で取得
+    private func getCurrentLocationString() -> String? {
+        // LocationManagerから住所を取得
+        if let address = locationManager.currentAddress {
+            return address
+        }
+
+        // 住所がまだ取得できていない場合は緯度経度を返す
+        guard let location = locationManager.currentLocation else {
+            return nil
+        }
+        return "緯度: \(String(format: "%.4f", location.coordinate.latitude)), 経度: \(String(format: "%.4f", location.coordinate.longitude))"
     }
 }
 
