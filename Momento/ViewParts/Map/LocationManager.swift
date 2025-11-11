@@ -46,6 +46,11 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             // 許可が得られたかどうかはデリゲートメソッドで確認
         }
 
+    // 位置情報の更新を開始
+        private func startUpdatingLocation() {
+            locationManager.startUpdatingLocation()
+        }
+
     func setPins(from albums: [Album]) {
 
         let newAnnotations: [LocationAnnotation] = albums.map { album in

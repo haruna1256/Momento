@@ -10,17 +10,25 @@ import AVFoundation
 struct CameraView: View {
     @StateObject private var cameraManager = CameraManager()
     @StateObject private var uploadService = PhotoUploadService()
+    @StateObject private var locationManager = LocationManager()
 
     @State private var isCameraSetup = false
     @State private var flashMode: FlashMode = .auto
     @State private var isFrontCamera: Bool = false
     @State private var permissionDenied = false
 
+    // 確認画面表示用
+    @State private var showConfirmView = false
+    @State private var capturedImage: UIImage?
+
     // アップロード関連
     @State private var isUploading = false
     @State private var uploadSuccess = false
     @State private var uploadError: String?
     @State private var showUploadAlert = false
+
+    // アルバムIDを固定 or 選択できるようにする
+    private let albumId = "default_album"
 
     var body: some View {
         ZStack {
@@ -33,7 +41,7 @@ struct CameraView: View {
                 loadingView
             }
 
-            if !permissionDenied {
+            if !permissionDenied && !showConfirmView {
                 VStack {
                     controlBar(flashMode: $flashMode)
                         .background(Color("bgBodyColor"))
@@ -43,7 +51,7 @@ struct CameraView: View {
                     shutterArea(
                         isFrontCamera: $isFrontCamera,
                         onShutterTap: {
-                            captureAndUploadPhoto()
+                            capturePhoto()
                         },
                         onFlipTap: {
                             cameraManager.switchCamera()
@@ -54,14 +62,36 @@ struct CameraView: View {
                 }
             }
 
+            // 撮影後の確認画面
+            if showConfirmView, let image = capturedImage {
+                PhotoConfirmView(
+                    image: image,
+                    onDiscard: {
+                        // 破棄：確認画面を閉じてカメラに戻る
+                        showConfirmView = false
+                        capturedImage = nil
+                    },
+                    onSend: { caption in
+                        // 送信：アップロード処理を開始
+                        showConfirmView = false
+                        uploadPhoto(image, caption: caption)
+                    }
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
+            }
+
             // アップロード中のオーバーレイ
             if isUploading {
                 uploadingOverlay
+                    .zIndex(2)
             }
         }
         .statusBarHidden(true)
         .onAppear {
             checkCameraPermission()
+            // 位置情報の取得を開始
+            locationManager.requestLocation()
         }
         .onDisappear {
             cameraManager.stopSession()
@@ -71,18 +101,19 @@ struct CameraView: View {
             Button("OK", role: .cancel) {
                 uploadSuccess = false
                 uploadError = nil
+                capturedImage = nil
             }
         } message: {
             if uploadSuccess {
-                Text("写真をバックエンドに送信しました！")
+                Text("写真をバックエンドに送信しました!")
             } else if let error = uploadError {
                 Text(error)
             }
         }
     }
 
-    // 写真を撮影してアップロード
-    private func captureAndUploadPhoto() {
+    // 写真を撮影
+    private func capturePhoto() {
         // 撮影中は連続撮影を防止
         guard !cameraManager.isCapturing && !isUploading else { return }
 
@@ -93,20 +124,26 @@ struct CameraView: View {
                 return
             }
 
-            // アップロード開始
-            uploadPhoto(image)
+            // 撮影成功 → 確認画面を表示
+            capturedImage = image
+            withAnimation {
+                showConfirmView = true
+            }
         }
     }
 
     // 写真をバックエンドにアップロード
-    private func uploadPhoto(_ image: UIImage) {
+    private func uploadPhoto(_ image: UIImage, caption: String?) {
         isUploading = true
 
-        // メタデータの準備（オプション）
+        // メタデータの準備
         let metadata: [String: Any] = [
-            "timestamp": ISO8601DateFormatter().string(from: Date()),
+            "albumId": albumId,
+            "caption": caption ?? "",
+            "latitude": locationManager.currentLocation?.coordinate.latitude ?? 0.0,
+            "longitude": locationManager.currentLocation?.coordinate.longitude ?? 0.0,
             "camera_position": isFrontCamera ? "front" : "back",
-            "flash_mode": "\(flashMode)"
+            "timestamp": ISO8601DateFormatter().string(from: Date())
         ]
 
         Task {
@@ -138,8 +175,6 @@ struct CameraView: View {
             }
         }
     }
-
-    // MARK: - Views
 
     private var permissionDeniedView: some View {
         VStack(spacing: 20) {
@@ -194,7 +229,6 @@ struct CameraView: View {
         }
     }
 
-    // MARK: - Helper Methods
 
     private func checkCameraPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {

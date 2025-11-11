@@ -12,7 +12,7 @@ import UIKit
 class PhotoUploadService: ObservableObject {
 
     // バックエンドのエンドポイントURL
-    private let uploadURL = "http://10.109.0.164:4000/upload"
+    private let uploadURL = "http://10.200.4.152:4000/upload"
 
     enum UploadError: Error {
         case invalidImageData
@@ -67,7 +67,7 @@ class PhotoUploadService: ObservableObject {
 
         // 画像データの追加
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"photo\"; filename=\"photo.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
         body.append(imageData)
         body.append("\r\n".data(using: .utf8)!)
