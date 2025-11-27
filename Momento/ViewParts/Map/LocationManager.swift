@@ -22,6 +22,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     // 現在地を保持するプロパティ
     @Published var currentLocation: CLLocation?
 
+    // 現在地の住所
+    @Published var currentAddress: String?
+
     @Published private(set) var annotations: [LocationAnnotation] = []
 
     // 地図の表示領域
@@ -29,6 +32,8 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     // 重要: regionが更新されたことを通知するためのEquatableなID
     @Published var regionUpdateID = UUID()
+    // ジオコーダー
+    private let geocoder = CLGeocoder()
 
     override init() {
         super.init()
@@ -44,6 +49,63 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     func requestLocation() {
             locationManager.requestWhenInUseAuthorization()
             // 許可が得られたかどうかはデリゲートメソッドで確認
+        }
+
+    // 位置情報の更新を開始
+        private func startUpdatingLocation() {
+            locationManager.startUpdatingLocation()
+        }
+
+    // 緯度経度から住所を取得
+        func reverseGeocodeLocation(_ location: CLLocation) {
+            geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
+                guard let self = self else { return }
+
+                if let error = error {
+                    print("住所取得エラー: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let placemark = placemarks?.first else {
+                    print("住所情報が見つかりませんでした")
+                    return
+                }
+
+                // 住所を日本語形式で組み立て
+                var addressComponents: [String] = []
+
+                // 国
+                if let country = placemark.country {
+                    addressComponents.append(country)
+                }
+
+                // 都道府県
+                if let administrativeArea = placemark.administrativeArea {
+                    addressComponents.append(administrativeArea)
+                }
+
+                // 市区町村
+                if let locality = placemark.locality {
+                    addressComponents.append(locality)
+                }
+
+                // 町名
+                if let subLocality = placemark.subLocality {
+                    addressComponents.append(subLocality)
+                }
+
+                // 丁目・番地
+                if let thoroughfare = placemark.thoroughfare {
+                    addressComponents.append(thoroughfare)
+                }
+
+                let address = addressComponents.joined(separator: " ")
+
+                DispatchQueue.main.async {
+                    self.currentAddress = address
+                    print("住所取得成功: \(address)")
+                }
+            }
         }
 
     func setPins(from albums: [Album]) {
