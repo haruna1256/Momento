@@ -18,7 +18,7 @@ Before/Afterスライダーで変化を体験
 
 フロントエンド：Swift (SwiftUI)
 
-バックエンド：Firebase (Auth / Firestore / Storage)
+バックエンド：go supabase
 
 デザイン：Figma（モバイルUI設計）
 
